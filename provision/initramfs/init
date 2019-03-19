@@ -87,19 +87,18 @@ bondup() {
     modprobe bonding max_bonds=0 >/dev/null
 
     for slave in $BONDDEVS; do
-        ip addr flush dev $slave >/dev/null 2>&1
-        ip link set dev $slave nomaster down >/dev/null 2>&1 
+        ip addr flush dev $slave >/dev/null
+#        ip link set dev $slave nomaster down >/dev/null 2>&1 
     done
 
     msg_gray "Bringing up interface $DEVICE"
-    ip link add $DEVICE type bond mode $WWBONDMODE >/dev/null 
 
-    for slave in $BONDDEVS; do
-        ip link set $slave master $DEVICE
-    done
-    
-    if ip link set dev $DEVICE up >/dev/null ; then
-#    if ifenslave $DEVICE $BONDDEVS >/dev/null ; then
+    ip link add $DEVICE type bond >/dev/null 
+# busybox "ip" command does not support bonding modes
+    echo "$WWBONDMODE" > /sys/class/net/$DEVICE/bonding/mode
+    ip link set dev $DEVICE up
+
+    if ifenslave $DEVICE $BONDDEVS >/dev/null ; then
         wwsuccess
         
         if [ -n "$WWMTU" ]; then
