@@ -93,9 +93,13 @@ bondup() {
 
     msg_gray "Bringing up interface $DEVICE"
     ip link add $DEVICE type bond mode $WWBONDMODE >/dev/null 
-    ip link set dev $DEVICE up >/dev/null
 
-    if ifenslave $DEVICE $BONDDEVS >/dev/null ; then
+    for slave in $BONDDEVS; do
+        ip link set $slave master $DEVICE
+    done
+    
+    if ip link set dev $DEVICE up >/dev/null ; then
+#    if ifenslave $DEVICE $BONDDEVS >/dev/null ; then
         wwsuccess
         
         if [ -n "$WWMTU" ]; then
