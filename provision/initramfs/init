@@ -73,6 +73,7 @@ wwsuccess
 bondup() {
     DEVICE=$1
     BONDDEVS=`echo "$2" | sed -e "s/,/ /g"`
+    HWADDR=$3
 
     RETVAL=1
 
@@ -384,7 +385,7 @@ fi
 
 # First try to setup bonding if requested
 if [ -n "$WWBONDDEVS" ]; then
-    if bondup $WWNETDEV $WWBONDDEVS; then
+    if bondup $WWNETDEV $WWBONDDEVS $WWHWADDR; then
         echo "$WWNETDEV" > /tmp/wwdev
     fi
 fi
