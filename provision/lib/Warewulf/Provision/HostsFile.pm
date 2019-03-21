@@ -93,7 +93,7 @@ generate()
 
     my $netdev = $config->get("network device");
     my $defdomain = $config->get("use localdomain") || "yes";
-    my $defshortname = $config->get("short nodename") || "yes";
+    my $defshortname = $config->get("short hostname") || "yes";
 
     my $master_ipaddr = $config->get("ip address") // $netobj->ipaddr($netdev);
     my $master_network = $config->get("ip network") // $netobj->network($netdev);
@@ -175,7 +175,12 @@ generate()
             # Renaming the node to include the device name... This will not be
             # persisted, so this is just temporary.
             $n->nodename($nodename ."-". $devname);
-            push(@name_entries, reverse $n->name());
+            if ($defshortname eq 'yes') {
+                push(@name_entries, reverse $n->name());
+            }
+            else {
+                push(@name_entries, reverse grep { $_ ne $nodename ."-". $devname } $n->name());
+            }
 
             if ($node_ipaddr and @name_entries) {
                 $hosts .= sprintf("%-23s %s\n", $node_ipaddr, join(" ", @name_entries));
