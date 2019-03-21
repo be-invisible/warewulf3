@@ -93,6 +93,8 @@ generate()
 
     my $netdev = $config->get("network device");
     my $defdomain = $config->get("use localdomain") || "yes";
+    my $defshortname = $config->get("short nodename") || "yes";
+
     my $master_ipaddr = $config->get("ip address") // $netobj->ipaddr($netdev);
     my $master_network = $config->get("ip network") // $netobj->network($netdev);
     my $master_netmask = $config->get("ip netmask") // $netobj->netmask($netdev);
@@ -162,7 +164,12 @@ generate()
                 &dprint("Using $nodename-$devname as default\n");
                 $default_name = 1;
                 $n->nodename($nodename);
-                push(@name_entries, reverse $n->name());
+                if ($defshortname eq 'yes') {
+                    push(@name_entries, reverse $n->name());
+                }
+                else {
+                    push(@name_entries, reverse grep { $_ ne $nodename } $n->name());
+                }
             }
 
             # Renaming the node to include the device name... This will not be
